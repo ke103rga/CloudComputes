@@ -42,6 +42,7 @@ class EmployeeUDPServer
             
             byte[] sdata = Encoding.ASCII.GetBytes(response);
             udpc.Send(sdata, sdata.Length, ep);
+                
         }
         udpc.Close();
         Console.WriteLine("Server closed");

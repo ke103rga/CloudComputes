@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option csharp_namespace = "CitiesGameClient";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+service CitiesGame {
+  rpc Connect(ConnectionRequest) returns (ConnectionResponse);
+  rpc GetGameState(PlayerRequest) returns (GameStateResponse);
+  rpc PlayTurn(TurnRequest) returns (TurnResponse);
+}
+
+message ConnectionRequest {
+  string player_name = 1;
+  int32 lobby_capacity = 2;
+}
+
+message PlayerRequest {
+  string player_name = 1;
+}
+
+message ConnectionResponse {
+  string connection_status = 1;
+  string error_message = 2;
+}
+
+message GameStateResponse {
+  string game_status = 1;
+  string active_players = 2;
+  string current_turn_player = 3;
+  google.protobuf.Timestamp timer_out_time = 4;
+  google.protobuf.Timestamp last_change_time = 5;
+  string last_change_desc = 6;
+  string last_played_city = 7;
+}
+
+message TurnRequest {
+  string player_name = 1;
+  string city_name = 2;
+}
+
+message TurnResponse {
+  bool turn_is_correct = 1;
+  string error_message = 2;
+}

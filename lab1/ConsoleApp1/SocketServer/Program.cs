@@ -6,8 +6,7 @@ using System;
 using System.Net;
 using SocketServer;
 
-// EmployeeTCPServer server = new EmployeeTCPServer();
-// server.Start();
+EmployeeTCPServer server = new EmployeeTCPServer();
+// EmployeeUDPServer server = new EmployeeUDPServer();
 
-EmployeeUDPServer server = new EmployeeUDPServer();
 server.Start();

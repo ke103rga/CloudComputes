@@ -1,35 +1,13 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace SocketServer;
+namespace WordsSorter;
 
-class EmployeeTCPServer{
-    
+public class Server
+{
     const int LIMIT = 5; //можем обработать сразу 5 клиентов одновременно
     TcpListener? listener;
     
-    Dictionary<string, string> employees =
-        new Dictionary<string, string>()
-        {
-            {"john", "manager"},
-            {"jane", "steno"},
-            {"jim", "clerk"},
-            {"jack", "salesman"}
-        };
-
-    public static void showIPs(string[] args)
-    {
-        string name = (args.Length < 1) ? Dns.GetHostName() : args[0];
-        try{
-            IPAddress[] addrs = Dns.Resolve(name).AddressList;
-            foreach(IPAddress addr in addrs)
-                Console.WriteLine("{0}/{1}",name,addr);
-        }catch(Exception e){
-            Console.WriteLine(e.Message);
-        }
-    }
-
-
     public void Start()
     {
         //Порт нашего сервера
@@ -47,7 +25,7 @@ class EmployeeTCPServer{
             t.Start();
         }
     }
-
+    
     private void ServiceSocket()
     {
         while (true)
@@ -62,28 +40,34 @@ class EmployeeTCPServer{
                 StreamReader sr = new StreamReader(s);
                 StreamWriter sw = new StreamWriter(s);
                 sw.AutoFlush = true; // enable automatic flushing
-
-                sw.WriteLine("{0} Employees available",
-                    employees.Count);
                 
                 while (true)
                 {
-                    sw.WriteLine("Enter the employee name -> ");
-                    // Console.WriteLine("Enter the employee name -> ");
-                    string? name = sr.ReadLine();
-                    if (string.IsNullOrEmpty(name))
+                    sw.WriteLine("Enter the sequence of words in one line. Use ', ' as a separator");
+                    
+                    // Получение текста от клиента
+                    string text = sr.ReadLine();
+                    
+                    // Проверка на завершение работы
+                    if (string.IsNullOrEmpty(text))
                     {
                         sw.Write("Connection will be closed...");
                         break;
                     }
-                    string response =
-                        employees.GetValueOrDefault(name, "NotExistingName");
-                    if (response == "NotExistingName") response = $"No such employee with name {name}";
-                    sw.WriteLine($"Employee {name} has job: {response}");
+
+                    // Обработка текста
+                    string[] words = text.Split(", ", StringSplitOptions.RemoveEmptyEntries);
+                    HashSet<string> uniqueWords = new HashSet<string>(words, StringComparer.OrdinalIgnoreCase);
+                    List<string> sortedWords = new List<string>(uniqueWords);
+                    sortedWords.Sort();
+
+                    // Отправка результата обратно клиенту
+                    string result = string.Join(", ", sortedWords);
+                    sw.WriteLine(result);
                 }
 
                 s.Close();
-                // soc.Close();
+                soc.Close();
             }
             catch (Exception e)
             {
@@ -93,5 +77,4 @@ class EmployeeTCPServer{
             }
         }
     }
-    
 }
